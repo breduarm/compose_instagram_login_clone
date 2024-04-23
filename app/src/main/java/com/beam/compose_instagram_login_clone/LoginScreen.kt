@@ -1,5 +1,6 @@
 package com.beam.compose_instagram_login_clone
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +45,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
+
+fun enableLogin(email: String, password: String): Boolean {
+    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isPasswordValid = password.length >= 6
+    return isEmailValid && isPasswordValid
+}
 
 @Composable
 fun LoginScreen(contract: LoginScreenContract? = null) {
@@ -70,14 +78,20 @@ fun Header(contract: LoginScreenContract?, modifier: Modifier) {
 fun Body(modifier: Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    val isLoginEnable by rememberSaveable { mutableStateOf(false) }
+    var isLoginEnable by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier) {
         Logo()
         Spacer(modifier = Modifier.size(16.dp))
-        Email(email) { email = it }
+        Email(email) {
+            email = it
+            isLoginEnable = enableLogin(email, password)
+        }
         Spacer(modifier = Modifier.size(4.dp))
-        Password(password) { password = it }
+        Password(password) {
+            password = it
+            isLoginEnable = enableLogin(email, password)
+        }
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
@@ -174,7 +188,17 @@ fun ForgotPassword(modifier: Modifier) {
 
 @Composable
 fun LoginButton(loginEnable: Boolean) {
-    Button(onClick = { /*TODO*/ }, enabled = loginEnable, modifier = Modifier.fillMaxWidth()) {
+    Button(
+        onClick = { /*TODO*/ },
+        enabled = loginEnable,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF4EA8E9),
+            disabledContainerColor = Color(0xFF78C8F9),
+            contentColor = Color.White,
+            disabledContentColor = Color.White
+        )
+    ) {
         Text(text = "Log in")
     }
 }
