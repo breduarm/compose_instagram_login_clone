@@ -13,14 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +70,7 @@ fun Header(contract: LoginScreenContract?, modifier: Modifier) {
 fun Body(modifier: Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var isLoginEnable by rememberSaveable { mutableStateOf(false) }
+    val isLoginEnable by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier) {
         Logo()
@@ -92,12 +100,64 @@ fun Logo() {
 
 @Composable
 fun Email(email: String, onTextChange: (String) -> Unit) {
-    TextField(value = email, onValueChange = onTextChange, modifier = Modifier.fillMaxWidth())
+    TextField(
+        value = email,
+        onValueChange = onTextChange,
+        maxLines = 1,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color(0xFFFAFAFA),
+            unfocusedContainerColor = Color(0xFFFAFAFA),
+            focusedTextColor = Color(0xFFB2B2B2),
+            unfocusedTextColor = Color(0xFFB2B2B2),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = {
+            Text(text = "Phone number, username or email", color = Color(0xFFB5B5B5))
+        }
+    )
 }
 
 @Composable
 fun Password(password: String, onTextChange: (String) -> Unit) {
-    TextField(value = password, onValueChange = onTextChange, modifier = Modifier.fillMaxWidth())
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    TextField(
+        value = password,
+        onValueChange = onTextChange,
+        maxLines = 1,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color(0xFFFAFAFA),
+            unfocusedContainerColor = Color(0xFFFAFAFA),
+            focusedTextColor = Color(0xFFB2B2B2),
+            unfocusedTextColor = Color(0xFFB2B2B2),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = {
+            Text(text = "Password", color = Color(0xFFB5B5B5))
+        },
+        trailingIcon = {
+            val icon = if (passwordVisibility) {
+                Icons.Filled.VisibilityOff
+            } else {
+                Icons.Filled.Visibility
+            }
+            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                Icon(imageVector = icon, contentDescription = "password visibility")
+            }
+        },
+        visualTransformation = if (passwordVisibility) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        }
+    )
 }
 
 @Composable
