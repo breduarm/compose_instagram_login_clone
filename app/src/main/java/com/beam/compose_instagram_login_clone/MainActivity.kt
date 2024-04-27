@@ -6,10 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.beam.compose_instagram_login_clone.login.LoginScreen
+import com.beam.compose_instagram_login_clone.login.LoginScreenContract
+import com.beam.compose_instagram_login_clone.login.LoginViewModel
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
 
 class MainActivity : ComponentActivity(), LoginScreenContract {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity(), LoginScreenContract {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginScreen(contract = this)
+                    LoginScreen(viewModel = LoginViewModel(),  contract = this)
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.beam.compose_instagram_login_clone
+package com.beam.compose_instagram_login_clone.login
 
 import android.util.Patterns
 import androidx.compose.foundation.Image
@@ -30,6 +30,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.beam.compose_instagram_login_clone.R
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
 
 fun enableLogin(email: String, password: String): Boolean {
@@ -53,14 +55,14 @@ fun enableLogin(email: String, password: String): Boolean {
 }
 
 @Composable
-fun LoginScreen(contract: LoginScreenContract? = null) {
+fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
         Header(contract, Modifier.align(Alignment.TopEnd))
-        Body(Modifier.align(Alignment.Center))
+        Body(viewModel, Modifier.align(Alignment.Center))
         Footer(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -75,8 +77,8 @@ fun Header(contract: LoginScreenContract?, modifier: Modifier) {
 }
 
 @Composable
-fun Body(modifier: Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
+fun Body(viewModel: LoginViewModel, modifier: Modifier) {
+    val email: String by viewModel.email.observeAsState(initial = "")
     var password by rememberSaveable { mutableStateOf("") }
     var isLoginEnable by rememberSaveable { mutableStateOf(false) }
 
@@ -84,8 +86,7 @@ fun Body(modifier: Modifier) {
         Logo()
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            email = it
-            isLoginEnable = enableLogin(email, password)
+            viewModel.onLoginChange(email = it)
         }
         Spacer(modifier = Modifier.size(4.dp))
         Password(password) {
@@ -287,6 +288,6 @@ fun SignUp() {
 @Composable
 fun LoginScreenPreview() {
     Compose_instagram_login_cloneTheme {
-        LoginScreen()
+        LoginScreen(LoginViewModel())
     }
 }
