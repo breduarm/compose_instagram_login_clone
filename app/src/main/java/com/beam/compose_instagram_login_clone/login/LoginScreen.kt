@@ -48,12 +48,6 @@ import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.R
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
 
-fun enableLogin(email: String, password: String): Boolean {
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    val isPasswordValid = password.length >= 6
-    return isEmailValid && isPasswordValid
-}
-
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null) {
     Box(
@@ -79,19 +73,18 @@ fun Header(contract: LoginScreenContract?, modifier: Modifier) {
 @Composable
 fun Body(viewModel: LoginViewModel, modifier: Modifier) {
     val email: String by viewModel.email.observeAsState(initial = "")
-    var password by rememberSaveable { mutableStateOf("") }
-    var isLoginEnable by rememberSaveable { mutableStateOf(false) }
+    val password: String by viewModel.password.observeAsState(initial = "")
+    val isLoginEnable: Boolean by viewModel.isLoginEnable.observeAsState(initial = false)
 
     Column(modifier = modifier) {
         Logo()
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            viewModel.onLoginChange(email = it)
+            viewModel.onLoginChange(email = it, password = password)
         }
         Spacer(modifier = Modifier.size(4.dp))
         Password(password) {
-            password = it
-            isLoginEnable = enableLogin(email, password)
+            viewModel.onLoginChange(email = email, password = it)
         }
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
