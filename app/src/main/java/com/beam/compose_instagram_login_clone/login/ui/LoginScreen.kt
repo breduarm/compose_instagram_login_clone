@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,9 +56,14 @@ fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        Header(contract, Modifier.align(Alignment.TopEnd))
-        Body(viewModel, Modifier.align(Alignment.Center))
-        Footer(Modifier.align(Alignment.BottomCenter))
+        val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        } else {
+            Header(contract, Modifier.align(Alignment.TopEnd))
+            Body(viewModel, Modifier.align(Alignment.Center))
+            Footer(Modifier.align(Alignment.BottomCenter))
+        }
     }
 }
 

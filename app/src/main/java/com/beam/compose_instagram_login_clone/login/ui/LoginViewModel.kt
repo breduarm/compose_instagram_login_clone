@@ -22,6 +22,9 @@ class LoginViewModel : ViewModel() {
     private val _isLoginEnable = MutableLiveData<Boolean>()
     val isLoginEnable: LiveData<Boolean> = _isLoginEnable
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
         _password.value = password
@@ -30,11 +33,14 @@ class LoginViewModel : ViewModel() {
 
     fun onClickLogin() {
         viewModelScope.launch {
+            _isLoading.value = true
             val result = loginUseCase(email.value!!, password.value!!)
             if (result) {
+                Thread.sleep(1000)
                 // TODO Navigate to next screen
                 Log.i(LoginViewModel::class.java.simpleName, "Login succeed")
             }
+            _isLoading.value = false
         }
     }
 
