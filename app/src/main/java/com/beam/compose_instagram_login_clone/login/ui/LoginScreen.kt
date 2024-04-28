@@ -80,16 +80,16 @@ fun Body(viewModel: LoginViewModel, modifier: Modifier) {
         Logo()
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            viewModel.onLoginChange(email = it, password = password)
+            viewModel.onLoginChanged(email = it, password = password)
         }
         Spacer(modifier = Modifier.size(4.dp))
         Password(password) {
-            viewModel.onLoginChange(email = email, password = it)
+            viewModel.onLoginChanged(email = email, password = it)
         }
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton(isLoginEnable)
+        LoginButton(isLoginEnable, viewModel)
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(32.dp))
@@ -181,9 +181,9 @@ fun ForgotPassword(modifier: Modifier) {
 }
 
 @Composable
-fun LoginButton(loginEnable: Boolean) {
+fun LoginButton(loginEnable: Boolean, viewModel: LoginViewModel) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = viewModel::onClickLogin,
         enabled = loginEnable,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
