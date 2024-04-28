@@ -1,6 +1,5 @@
-package com.beam.compose_instagram_login_clone.login
+package com.beam.compose_instagram_login_clone.login.ui
 
-import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.R
+import com.beam.compose_instagram_login_clone.login.LoginScreenContract
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
 
 @Composable

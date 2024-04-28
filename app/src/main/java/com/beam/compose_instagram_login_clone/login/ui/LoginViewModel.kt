@@ -1,4 +1,4 @@
-package com.beam.compose_instagram_login_clone.login
+package com.beam.compose_instagram_login_clone.login.ui
 
 import android.provider.ContactsContract.CommonDataKinds.Email
 import android.util.Patterns
