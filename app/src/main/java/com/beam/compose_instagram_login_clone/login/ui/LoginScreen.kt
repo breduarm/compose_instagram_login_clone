@@ -43,6 +43,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.R
@@ -51,17 +53,49 @@ import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_c
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null) {
+    val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
+    val email: String by viewModel.email.observeAsState(initial = "")
+    val password: String by viewModel.password.observeAsState(initial = "")
+    val isLoginEnable: Boolean by viewModel.isLoginEnable.observeAsState(initial = false)
+
+    LoginScreenContent(
+        isLoading = isLoading,
+        contract = contract,
+        email = email,
+        password = password,
+        isLoginEnable = isLoginEnable,
+        onLoginChanged = viewModel::onLoginChanged,
+        onClickLogin = viewModel::onClickLogin,
+    )
+}
+
+@Composable
+fun LoginScreenContent(
+    isLoading: Boolean,
+    contract: LoginScreenContract?,
+    email: String,
+    password: String,
+    isLoginEnable: Boolean,
+    onLoginChanged: (String, String) -> Unit,
+    onClickLogin: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
             Header(contract, Modifier.align(Alignment.TopEnd))
-            Body(viewModel, Modifier.align(Alignment.Center))
+            Body(
+                email = email,
+                password = password,
+                isLoginEnable = isLoginEnable,
+                onLoginChanged = onLoginChanged,
+                onClickLogin = onClickLogin,
+                modifier = Modifier.align(Alignment.Center)
+            )
             Footer(Modifier.align(Alignment.BottomCenter))
         }
     }
@@ -77,25 +111,29 @@ fun Header(contract: LoginScreenContract?, modifier: Modifier) {
 }
 
 @Composable
-fun Body(viewModel: LoginViewModel, modifier: Modifier) {
-    val email: String by viewModel.email.observeAsState(initial = "")
-    val password: String by viewModel.password.observeAsState(initial = "")
-    val isLoginEnable: Boolean by viewModel.isLoginEnable.observeAsState(initial = false)
+fun Body(
+    modifier: Modifier,
+    email: String,
+    password: String,
+    isLoginEnable: Boolean,
+    onLoginChanged: (String, String) -> Unit,
+    onClickLogin: () -> Unit,
+) {
 
     Column(modifier = modifier) {
         Logo()
         Spacer(modifier = Modifier.size(16.dp))
         Email(email) {
-            viewModel.onLoginChanged(email = it, password = password)
+            onLoginChanged(it, password)
         }
         Spacer(modifier = Modifier.size(4.dp))
         Password(password) {
-            viewModel.onLoginChanged(email = email, password = it)
+            onLoginChanged(email, it)
         }
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton(isLoginEnable, viewModel)
+        LoginButton(isLoginEnable, onClickLogin)
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(32.dp))
@@ -187,9 +225,9 @@ fun ForgotPassword(modifier: Modifier) {
 }
 
 @Composable
-fun LoginButton(loginEnable: Boolean, viewModel: LoginViewModel) {
+fun LoginButton(loginEnable: Boolean, onClickLogin: () -> Unit) {
     Button(
-        onClick = viewModel::onClickLogin,
+        onClick = onClickLogin,
         enabled = loginEnable,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
@@ -283,10 +321,55 @@ fun SignUp() {
     }
 }
 
+data class LoginScreenData(
+    val isLoading: Boolean,
+    val contract: LoginScreenContract? = null,
+    val email: String,
+    val password: String,
+    val isLoginEnable: Boolean,
+    val onLoginChanged: (String, String) -> Unit,
+    val onClickLogin: () -> Unit,
+)
+
+val sampleData = listOf(
+    LoginScreenData(
+        isLoading = false,
+        contract = null,
+        email = "",
+        password = "",
+        isLoginEnable = false,
+        onLoginChanged = { _, _ -> },
+        onClickLogin = {},
+    ),
+    LoginScreenData(
+        isLoading = true,
+        contract = null,
+        email = "bryan@arm.com",
+        password = "123456",
+        isLoginEnable = true,
+        onLoginChanged = { _, _ -> },
+        onClickLogin = {},
+    )
+)
+
+class LoginScreenPreviewProvider : PreviewParameterProvider<LoginScreenData> {
+    override val values: Sequence<LoginScreenData> = sampleData.asSequence()
+}
+
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun LoginScreenPreview(
+    @PreviewParameter(LoginScreenPreviewProvider::class) data: LoginScreenData
+) {
     Compose_instagram_login_cloneTheme {
-        LoginScreen(LoginViewModel())
+        LoginScreenContent(
+            isLoading = data.isLoading,
+            contract = data.contract,
+            email = data.email,
+            password = data.password,
+            isLoginEnable = data.isLoginEnable,
+            onLoginChanged = data.onLoginChanged,
+            onClickLogin = data.onClickLogin,
+        )
     }
 }
