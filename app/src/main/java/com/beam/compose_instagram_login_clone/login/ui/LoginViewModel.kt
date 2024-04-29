@@ -2,46 +2,42 @@ package com.beam.compose_instagram_login_clone.login.ui
 
 import android.util.Log
 import android.util.Patterns
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.beam.compose_instagram_login_clone.login.LoginScreenContract
 import com.beam.compose_instagram_login_clone.login.domain.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase) : ViewModel() {
 
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
-
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
-
-    private val _isLoginEnable = MutableLiveData<Boolean>()
-    val isLoginEnable: LiveData<Boolean> = _isLoginEnable
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _screenUiState = MutableStateFlow(LoginScreenUiState())
+    val screenUiState = _screenUiState.asStateFlow()
 
     fun onLoginChanged(email: String, password: String) {
-        _email.value = email
-        _password.value = password
-        _isLoginEnable.value = enableLogin(email, password)
+        _screenUiState.value = _screenUiState.value.copy(
+            email = email,
+            password = password,
+            loginEnable = enableLogin(email, password)
+        )
     }
 
     fun onClickLogin() {
         viewModelScope.launch {
-            _isLoading.value = true
-            val result = loginUseCase(email.value!!, password.value!!)
+            _screenUiState.value = _screenUiState.value.copy(loading = true)
+            val email = _screenUiState.value.email
+            val password = _screenUiState.value.password
+            val result = loginUseCase(email, password)
             if (result) {
                 Thread.sleep(1000)
                 // TODO Navigate to next screen
                 Log.i(LoginViewModel::class.java.simpleName, "Login succeed")
             }
-            _isLoading.value = false
+            _screenUiState.value = _screenUiState.value.copy(loading = false)
         }
     }
 
@@ -50,4 +46,14 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase)
         val isPasswordValid = password.length >= 6
         return isEmailValid && isPasswordValid
     }
+
+    data class LoginScreenUiState(
+        val loading: Boolean = false,
+        val contract: LoginScreenContract? = null, // TODO bind contract
+        val email: String = "",
+        val password: String = "",
+        val loginEnable: Boolean = false,
+        val onLoginChanged: (String, String) -> Unit = { _, _ -> },
+        val onClickLogin: () -> Unit = {},
+    )
 }

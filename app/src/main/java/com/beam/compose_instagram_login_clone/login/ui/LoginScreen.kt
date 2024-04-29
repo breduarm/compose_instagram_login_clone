@@ -29,8 +29,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -49,21 +49,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.R
 import com.beam.compose_instagram_login_clone.login.LoginScreenContract
+import com.beam.compose_instagram_login_clone.login.ui.LoginViewModel.LoginScreenUiState
 import com.beam.compose_instagram_login_clone.ui.theme.Compose_instagram_login_cloneTheme
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null) {
-    val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
-    val email: String by viewModel.email.observeAsState(initial = "")
-    val password: String by viewModel.password.observeAsState(initial = "")
-    val isLoginEnable: Boolean by viewModel.isLoginEnable.observeAsState(initial = false)
+    val screenUiState: LoginScreenUiState by viewModel.screenUiState.collectAsState()
 
     LoginScreenContent(
-        isLoading = isLoading,
+        loading = screenUiState.loading,
         contract = contract,
-        email = email,
-        password = password,
-        isLoginEnable = isLoginEnable,
+        email = screenUiState.email,
+        password = screenUiState.password,
+        loginEnable = screenUiState.loginEnable,
         onLoginChanged = viewModel::onLoginChanged,
         onClickLogin = viewModel::onClickLogin,
     )
@@ -71,11 +69,11 @@ fun LoginScreen(viewModel: LoginViewModel, contract: LoginScreenContract? = null
 
 @Composable
 fun LoginScreenContent(
-    isLoading: Boolean,
+    loading: Boolean,
     contract: LoginScreenContract?,
     email: String,
     password: String,
-    isLoginEnable: Boolean,
+    loginEnable: Boolean,
     onLoginChanged: (String, String) -> Unit,
     onClickLogin: () -> Unit
 ) {
@@ -84,14 +82,14 @@ fun LoginScreenContent(
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        if (isLoading) {
+        if (loading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
             Header(contract, Modifier.align(Alignment.TopEnd))
             Body(
                 email = email,
                 password = password,
-                isLoginEnable = isLoginEnable,
+                loginEnable = loginEnable,
                 onLoginChanged = onLoginChanged,
                 onClickLogin = onClickLogin,
                 modifier = Modifier.align(Alignment.Center)
@@ -115,7 +113,7 @@ fun Body(
     modifier: Modifier,
     email: String,
     password: String,
-    isLoginEnable: Boolean,
+    loginEnable: Boolean,
     onLoginChanged: (String, String) -> Unit,
     onClickLogin: () -> Unit,
 ) {
@@ -133,7 +131,7 @@ fun Body(
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton(isLoginEnable, onClickLogin)
+        LoginButton(loginEnable, onClickLogin)
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(32.dp))
@@ -321,55 +319,54 @@ fun SignUp() {
     }
 }
 
-data class LoginScreenData(
-    val isLoading: Boolean,
-    val contract: LoginScreenContract? = null,
-    val email: String,
-    val password: String,
-    val isLoginEnable: Boolean,
-    val onLoginChanged: (String, String) -> Unit,
-    val onClickLogin: () -> Unit,
-)
-
 val sampleData = listOf(
-    LoginScreenData(
-        isLoading = false,
+    LoginScreenUiState(
+        loading = false,
         contract = null,
         email = "",
         password = "",
-        isLoginEnable = false,
+        loginEnable = false,
         onLoginChanged = { _, _ -> },
         onClickLogin = {},
     ),
-    LoginScreenData(
-        isLoading = true,
+    LoginScreenUiState(
+        loading = false,
         contract = null,
         email = "bryan@arm.com",
         password = "123456",
-        isLoginEnable = true,
+        loginEnable = true,
         onLoginChanged = { _, _ -> },
         onClickLogin = {},
-    )
+    ),
+    LoginScreenUiState(
+        loading = true,
+        contract = null,
+        email = "",
+        password = "",
+        loginEnable = false,
+        onLoginChanged = { _, _ -> },
+        onClickLogin = {},
+    ),
 )
 
-class LoginScreenPreviewProvider : PreviewParameterProvider<LoginScreenData> {
-    override val values: Sequence<LoginScreenData> = sampleData.asSequence()
+class LoginScreenPreviewProvider : PreviewParameterProvider<LoginScreenUiState> {
+    override val values: Sequence<LoginScreenUiState> = sampleData.asSequence()
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview(
-    @PreviewParameter(LoginScreenPreviewProvider::class) data: LoginScreenData
+    @PreviewParameter(LoginScreenPreviewProvider::class) uiState: LoginScreenUiState
 ) {
     Compose_instagram_login_cloneTheme {
         LoginScreenContent(
-            isLoading = data.isLoading,
-            contract = data.contract,
-            email = data.email,
-            password = data.password,
-            isLoginEnable = data.isLoginEnable,
-            onLoginChanged = data.onLoginChanged,
-            onClickLogin = data.onClickLogin,
+            loading = uiState.loading,
+            contract = uiState.contract,
+            email = uiState.email,
+            password = uiState.password,
+            loginEnable = uiState.loginEnable,
+            onLoginChanged = uiState.onLoginChanged,
+            onClickLogin = uiState.onClickLogin,
         )
     }
 }
