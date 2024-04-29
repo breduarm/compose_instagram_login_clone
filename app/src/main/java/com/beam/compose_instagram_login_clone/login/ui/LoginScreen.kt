@@ -43,6 +43,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beam.compose_instagram_login_clone.R
@@ -280,13 +282,5 @@ fun SignUp() {
             color = Color(0xFF4EA8E9),
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    Compose_instagram_login_cloneTheme {
-        LoginScreen(LoginViewModel())
     }
 }
