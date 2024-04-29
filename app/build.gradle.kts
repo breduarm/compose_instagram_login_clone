@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.googleDaggerHiltAndroid)
+    kotlin("kapt")
 }
 
 android {
@@ -60,9 +62,14 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.runtime.livedata)
+
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    // DI Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
